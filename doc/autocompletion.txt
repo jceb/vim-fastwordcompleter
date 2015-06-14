@@ -1,33 +1,34 @@
-*fastwordcompleter.txt* 		Editing support through autocompletion
+*autocompletion.txt* 		Editing support through autocompletion
 
                 	by Jan Christoph Ebersbach
 
 ==============================================================================
-							*fastwordcompleter*
+							        *autocompletion*
 
-Fastwordcompleter is a plugin to support editing of arbitrary text files
+Autocompletion is a plugin to support editing of arbitrary text files
 through offering autocompletion while typing. The plugin is highly inspired by
 http://vim.sourceforge.net/scripts/script.php?script_id=73 but in contrast
 much much faster.
 
 VARIABLES
 
-Autoactivate fast word completion for the defined filetypes - comma separated.
+Activate fast word completion for the defined filetypes, a comma separated
+string or *.
 
 let g:fastwordcompleter_filetypes = 'filetype,...'
 
 Normally the vim complete option is set to show no menu if only one item is
-avaiable for completion. Fastwordcompleter sets completeopt to menuone to
-display also single items. If you don't like this set the following variable.
+avaiable for completion. Autocompletion sets completeopt to menuone to display
+also single items. If you don't like this set the following variable.
 
-let g:loaded_fastwordcompletion = 1
+let g:loaded_autocompletion = 1
 
 COMMANDS
 
-Start and stop fast word completion or use the menu Plugin/FastWordCompleter:
+Start and stop autocompletion or use the menu Plugin/Autocompletion:
 
-:FastWordCompletionStart
-:FastWordCompletionStop
+:AutocompletionStart
+:AutocompletionStop
 
 ==============================================================================
 
