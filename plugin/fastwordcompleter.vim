@@ -1,7 +1,7 @@
-" fastwordcompleter.vim:	automatically offers word completion
-" Last Modified: Do 01. Jul 2010 11:36:58 +0200 CEST
+" autocompletion.vim:	automatically offers word completion
+" Last Modified: Sun 14. Jun 2015 21:43:24 +0200 CEST
 " Author:		Jan Christoph Ebersbach <jceb@e-jc.de>
-" Version:		0.2
+" Version:		0.3
 "
 " inspired by http://vim.sourceforge.net/scripts/script.php?script_id=73
 
@@ -19,86 +19,95 @@
 " INSTALLATION:
 "  :source it from your vimrc file or drop it in your plugin directory.
 "  To activate, choose "Start Autocompletion" from the Tools menu, or type
-"  :call FastWordCompletionStart()
+"  :call AutocompletionStart()
 "  To make it stop, choose "Plugin/Stop Autocompletion", or type
-"  :call FastWordCompletionStop()
+"  :call AutocompletionStop()
 "  If you want to activate the script for certain filetypes, add the line
-"  	let g:fastwordcompleter_filetypes = 'filetype,...'
+"  	let g:autocompletion_filetypes = 'filetype,...'
 "  to your vimrc file.
 
-if (exists("g:loaded_fastwordcompletion") && g:loaded_fastwordcompletion) || &cp
+if (exists("g:loaded_autocompletion") && g:loaded_autocompletion) || &cp
     finish
 endif
-let g:loaded_fastwordcompletion = 1
+let g:loaded_autocompletion = 1
 
-if !exists('g:fastwordcompletion_nomenuone')
+if !exists('g:autocompletion_nomenuone')
   set completeopt=menuone
 endif
 
-if !exists("g:fastwordcompletion_min_length")
-  let g:fastwordcompletion_min_length = 0
+if !exists("g:autocompletion_min_length")
+  let g:autocompletion_min_length = 1
 endif
 
 let b:completion_active = 0
 
 " Make an :imap for each alphabetic character, and define a few :smap's.
-fun! s:FastWordCompletionStart()
+fun! s:AutocompletionStart()
   " Thanks to Bohdan Vlasyuk for suggesting a loop here:
   for c in [["A", "Z"], ["a", "z"]]
-    let letter = char2nr(c[0])
-    let letter_to = char2nr(c[1])
-    while letter <= letter_to
-      let char = nr2char(letter)
-      execute "inoremap <buffer> <expr> ".char." CompleteIfLongEnough('".char."')"
-      let letter += 1
+    let l:letter = char2nr(c[0])
+    let l:letter_to = char2nr(c[1])
+    while l:letter <= l:letter_to
+      let char = nr2char(l:letter)
+      execute "imap <buffer> <expr> ".char." <SID>Autocomplete('".char."')"
+      let l:letter += 1
     endwhile
   endfor
+  " start completion when . is pressed
+  inoremap <buffer> <expr> . <SID>Autocomplete(".")
   let b:completion_active = 1
 endfun
 
 
-" Remove all the mappings created by FastWordCompletionStart().
+" Remove all the mappings created by AutocompletionStart().
 " Lazy:  I do not save and restore existing mappings.
-fun! s:FastWordCompletionStop()
+fun! s:AutocompletionStop()
   if (!b:completion_active)
     return
   endif
   " Thanks to Bohdan Vlasyuk for suggesting a loop here:
   for c in [["A", "Z"], ["a", "z"]]
-    let letter = char2nr(c[0])
-    let letter_to = char2nr(c[1])
-    while letter <= letter_to
-      execute "iunmap <buffer> ".nr2char(letter)
-      let letter = letter + 1
+    let l:letter = char2nr(c[0])
+    let l:letter_to = char2nr(c[1])
+    while l:letter <= l:letter_to
+      execute "iunmap <buffer> ".nr2char(l:letter)
+      let l:letter = l:letter + 1
     endwhile
   endfor
   let b:completion_active = 0
 endfun
 
-if (exists('g:fastwordcompleter_filetypes') && len(g:fastwordcompleter_filetypes) > 0)
-    exec 'au FileType '.g:fastwordcompleter_filetypes.' :FastWordCompletionStart'
+if (exists('g:autocompletion_filetypes') && len(g:autocompletion_filetypes) > 0)
+    exec 'au FileType '.g:autocompletion_filetypes.' :AutocompletionStart'
 endif
 
-" Copletes current word if fastwordcompletion_min_length chars are written
+" Completes current word if autocompletion_min_length chars are written
 " char is given because v:char seems not to work
-fun! CompleteIfLongEnough(char)
-  let line = getline('.')
-  let substr = strpart(line, -1, col('.')+1)  " from start to cursor
-  let substr = matchstr(substr, "[^ \t]*$")   " word till cursor
-  " note we get wordlegth without current char
-  if (strlen(substr)+1 >= g:fastwordcompletion_min_length)
-    return a:char . "\<C-n>\<C-p>"
-  else
-    return a:char
+fun! s:Autocomplete(char)
+  if !&paste
+    if !pumvisible()
+      let l:line = getline('.')
+      let l:word = strpart(l:line, -1, col('.')+1)  " from start to cursor
+      let l:word = matchstr(l:word, '\k*$')         " word before cursor
+      " note we get the word's length without the current char
+      if strlen(l:word)+1 >= g:autocompletion_min_length
+        if exists('g:vcm_default_maps')
+          return a:char."\<Tab>\<C-n>"
+        else
+          return a:char."\<C-x>\<C-p>\<C-n>"
+        endif
+      endif
+    endif
   endif
+  return a:char
 endfun
 
 if has("menu")
-  amenu &Plugin.&FastWordCompleter.&Start\ Autocompletion :FastWordCompletionStart<CR>
-  amenu &Plugin.&FastWordCompleter.Sto&p\ Autocompletion :FastWordCompletionStop<CR>
+  amenu &Plugin.&Autocompletion.&Start\ Autocompletion :AutocompletionStart<CR>
+  amenu &Plugin.&Autocompletion.Sto&p\ Autocompletion :AutocompletionStop<CR>
 endif
 
-command! -nargs=0 FastWordCompletionStart call <SID>FastWordCompletionStart()
-command! -nargs=0 FastWordCompletionStop call <SID>FastWordCompletionStop()
+command! -nargs=0 AutocompletionStart call <SID>AutocompletionStart()
+command! -nargs=0 AutocompletionStop call <SID>AutocompletionStop()
 
-" vim:sts=2:sw=2:ff=unix:
+" vi: ft=vim:tw=80:sw=2:ts=2:sts=2:et
