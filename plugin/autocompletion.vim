@@ -54,7 +54,7 @@ fun! s:AutocompletionStart()
     endwhile
   endfor
   " start completion when . is pressed
-  inoremap <buffer> <expr> . <SID>Autocomplete(".")
+  " inoremap <buffer> <expr> . <SID>Autocomplete(".")
   let b:completion_active = 1
 endfun
 
