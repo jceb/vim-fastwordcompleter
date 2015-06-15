@@ -89,7 +89,7 @@ fun! s:Autocomplete(char)
       let l:line = getline('.')
       let l:col = col('.')
       let l:word = strpart(l:line, -1, l:col)  " from start to cursor
-      let l:word = matchstr(l:word, '\k*$')         " word before cursor
+      let l:word = matchstr(l:word, '\S*$')         " word before cursor
       " note we get the word's length without the current char
       if strlen(l:word)+1 >= g:autocompletion_min_length
         if exists('g:vcm_default_maps')
