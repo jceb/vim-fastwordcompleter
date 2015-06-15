@@ -87,7 +87,8 @@ fun! s:Autocomplete(char)
   if !&paste
     if !pumvisible()
       let l:line = getline('.')
-      let l:word = strpart(l:line, -1, col('.')+1)  " from start to cursor
+      let l:col = col('.')
+      let l:word = strpart(l:line, -1, l:col)  " from start to cursor
       let l:word = matchstr(l:word, '\k*$')         " word before cursor
       " note we get the word's length without the current char
       if strlen(l:word)+1 >= g:autocompletion_min_length
