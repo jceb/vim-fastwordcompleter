@@ -1,7 +1,7 @@
 " autocompletion.vim:	automatically offers word completion
-" Last Modified: Sun 14. Jun 2015 21:43:24 +0200 CEST
+" Last Modified: Fri 25. Sep 2015 18:00:19 +0200 CEST
 " Author:		Jan Christoph Ebersbach <jceb@e-jc.de>
-" Version:		0.3
+" Version:		0.4
 "
 " inspired by http://vim.sourceforge.net/scripts/script.php?script_id=73
 
@@ -13,8 +13,6 @@
 " LIMITATIONS:
 "  The script works by :imap'ping each alphabetic character, and uses
 "  Insert-mode completion (:help ins-completion). It is far from perfect.
-"  If there is in total only one option to complete, no completion will be
-"  display because of vim's completion menu implementation.
 
 " INSTALLATION:
 "  :source it from your vimrc file or drop it in your plugin directory.
@@ -34,6 +32,10 @@ let g:loaded_autocompletion = 1
 if !exists('g:autocompletion_nomenuone')
   set completeopt=menuone
 endif
+
+" avoid completion options from being written into the buffer - let the user
+" select the preferred one manually
+set completeopt+=noinsert
 
 if !exists("g:autocompletion_min_length")
   let g:autocompletion_min_length = 1
@@ -84,19 +86,20 @@ endif
 " Completes current word if autocompletion_min_length chars are written
 " char is given because v:char seems not to work
 fun! s:Autocomplete(char)
-  if !&paste
-    if !pumvisible()
-      let l:line = getline('.')
-      let l:col = col('.')
-      let l:word = strpart(l:line, -1, l:col)  " from start to cursor
-      let l:word = matchstr(l:word, '\S*$')         " word before cursor
-      " note we get the word's length without the current char
-      if strlen(l:word)+1 >= g:autocompletion_min_length
-        if exists('g:vcm_default_maps')
-          return a:char."\<Tab>\<C-n>"
-        else
-          return a:char."\<C-x>\<C-p>\<C-n>"
-        endif
+  " Trigger comletion only when paste mode is not active and the completion menu
+  " is not displayed
+  if !&paste && !pumvisible()
+    let l:line = getline('.')
+    let l:col = col('.')
+    let l:word = strpart(l:line, -1, l:col)  " from start to cursor
+    let l:word = matchstr(l:word, '\S*$')         " word before cursor
+    " note we get the word's length without the current char
+    if strlen(l:word)+1 >= g:autocompletion_min_length
+      " integrate with the vim completes me plugin
+      if exists('g:vcm_default_maps')
+        return a:char."\<Tab>"
+      else
+        return a:char."\<C-x>\<C-p>"
       endif
     endif
   endif
