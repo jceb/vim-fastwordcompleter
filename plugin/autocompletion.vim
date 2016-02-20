@@ -62,7 +62,7 @@ endfun
 
 
 " Remove all the mappings created by AutocompletionStart().
-" Lazy:  I do not save and restore existing mappings.
+" Lazy: I do not save and restore existing mappings.
 fun! s:AutocompletionStop()
   if (!b:completion_active)
     return
@@ -92,7 +92,7 @@ fun! s:Autocomplete(char)
     let l:line = getline('.')
     let l:col = col('.')
     let l:word = strpart(l:line, -1, l:col)  " from start to cursor
-    let l:word = matchstr(l:word, '\S*$')         " word before cursor
+    let l:word = matchstr(l:word, '\S*$')  " word before cursor
     " note we get the word's length without the current char
     if strlen(l:word)+1 >= g:autocompletion_min_length
       " integrate with the vim completes me plugin
