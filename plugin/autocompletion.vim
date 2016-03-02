@@ -99,7 +99,7 @@ fun! s:Autocomplete(char)
       if exists('g:vcm_default_maps')
         return a:char."\<Tab>"
       else
-        return a:char."\<C-x>\<C-p>"
+        return a:char."\<C-n>"
       endif
     endif
   endif
